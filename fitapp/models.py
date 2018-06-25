@@ -73,6 +73,8 @@ class TimeSeriesDataType(models.Model):
             'the Fitbit documentation'
         ))
 
+    intraday_support = models.BooleanField(default=False)
+
     def __str__(self):
         return self.path()
 
@@ -115,9 +117,10 @@ class TimeSeriesData(models.Model):
             'For example, for step data the value might be "9783" (the units) '
             'would be "steps"'
         ))
+    intraday = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('user', 'resource_type', 'date')
+        unique_together = ('user', 'resource_type', 'date', 'intraday')
 
     def string_date(self):
         return self.date.strftime('%Y-%m-%d')

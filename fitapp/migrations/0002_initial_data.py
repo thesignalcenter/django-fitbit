@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 import os
 
 from django.core import serializers
-from django.db import migrations
+from django.db import migrations, models
+
 
 fixture_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../fixtures'))
 fixture_filename = 'initial_data.json'
@@ -33,5 +34,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='timeseriesdatatype',
+            name='intraday_support',
+            field=models.BooleanField(default=False),
+        ),
         migrations.RunPython(load_fixture, reverse_code=unload_fixture),
     ]

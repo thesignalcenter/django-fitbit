@@ -80,11 +80,27 @@ def get_time_series_data(self, fitbit_user, cat, resource, date=None):
 
             for fbuser in fbusers:
                 data = utils.get_fitbit_data(fbuser, _type, **dates)
+
+                if utils.get_setting('FITAPP_GET_INTRADAY'):
+                    tz_offset = utils.get_fitbit_profile(fbuser, 'offsetFromUTCMillis')
+                    tz_offset = tz_offset / 3600 / 1000 * -1  # Converted to positive hours
+
                 for datum in data:
                     # Create new record or update existing record
                     date = parser.parse(datum['dateTime'])
+                    if _type.intraday_support and \
+                            utils.get_setting('FITAPP_GET_INTRADAY'):
+                        resources = TimeSeriesDataType.objects.filter(
+                            intraday_support=True)
+                        for i, _type in enumerate(resources):
+                            # Offset each call by 2 seconds so they don't bog down
+                            # the server
+                            get_intraday_data(
+                                fbuser.fitbit_user, _type.category,
+                                _type.resource, date, tz_offset)
                     tsd, created = TimeSeriesData.objects.get_or_create(
-                        user=fbuser.user, resource_type=_type, date=date)
+                        user=fbuser.user, resource_type=_type, date=date,
+                        intraday=False)
                     tsd.value = datum['value']
                     tsd.save()
             # Release the lock

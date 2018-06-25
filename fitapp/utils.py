@@ -107,3 +107,16 @@ def _verified_setting(name):
                     list(set(res) - (set(res) & all_cat_res)), cat)
                 raise ImproperlyConfigured(msg)
     return result
+
+
+def get_fitbit_profile(fbuser, key=None):
+    """
+    Creates a Fitbit API instance and retrieves a user's profile.
+    """
+    fb = create_fitbit(**fbuser.get_user_data())
+    data = fb.user_profile_get()
+
+    data = data['user']
+    if key:
+        return data[key]
+    return data
