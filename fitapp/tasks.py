@@ -168,12 +168,16 @@ def get_intraday_data(fitbit_user, category, resource, date, tz_offset):
             for fbuser in fbusers:
                 data = utils.get_fitbit_data(fbuser, time_series_data_type, return_all=True,
                                              **dates)
+
                 resource_path = time_series_data_type.path().replace('/', '-')
                 key = resource_path + "-intraday"
+                print(key)
+                print(data[key])
                 if data[key]['datasetType'] != 'minute':
                     logger.exception("The resource returned is not "
                                      "minute-level data")
                     raise Reject(sys.exc_info()[1], requeue=False)
+                print('bbbb')
                 intraday = data[key]['dataset']
                 logger.info("Date for intraday task: {}".format(date))
                 for minute in intraday:

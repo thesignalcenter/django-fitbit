@@ -106,7 +106,7 @@ class TimeSeriesData(models.Model):
         help_text='The type of time series data',
         on_delete=models.CASCADE
     )
-    date = models.DateField(help_text='The date the data was recorded')
+    date = models.DateTimeField(help_text='The date the data was recorded')
     value = models.CharField(
         null=True,
         default=None,

@@ -22,3 +22,12 @@ using `tasks.get_time_series_data`.
 
 
 `FITAPP_GET_INTRADAY` must be set. If true, intraday data will be attempted to be retrieved
+
+
+Notes
+For some reason, `get_intraday_data` does NOT use the given `intraday_time_series` function provided by
+python-fitbit. It still works though using `time_series` because currently, with the type of request being made to that endpoint,
+Fitbit returns both regular step data and intraday data assuming the app is authorized to get intraday.
+
+Issues
+Assumes that the app is authorized for intraday data, does not check this as far as I have seen

@@ -405,6 +405,47 @@ class TestRetrievalTask(FitappTestBase):
         except:
             assert False, 'Any errors should be captured in the view'
 
+    @patch('fitapp.utils.get_fitbit_profile')
+    @patch('fitapp.utils.get_fitbit_data')
+    def test_retrieve_time_series_data(self, get_fitbit_data, get_fitbit_profile):
+        get_fitbit_profile.return_value = 0
+        get_fitbit_data.return_value = [{
+            "dateTime":"2014-09-05",
+            "activities-steps":[
+                {"dateTime":"2014-09-05","value":1433}
+            ],
+            "activities-steps-intraday":{
+                "dataset":[
+                    {"time":"00:00:00","value":0},
+                    {"time":"00:01:00","value":0},
+                    {"time":"00:02:00","value":0},
+                    {"time":"00:03:00","value":0},
+                    {"time":"00:04:00","value":0},
+                    {"time":"00:05:00","value":287},
+                    {"time":"00:06:00","value":287},
+                    {"time":"00:07:00","value":287},
+                    {"time":"00:08:00","value":287},
+                    {"time":"00:09:00","value":287},
+                    {"time":"00:10:00","value":0},
+                    {"time":"00:11:00","value":0},
+                ],
+                "datasetInterval":1,
+                "datasetType": "minute"
+            }
+        }
+        ]
+
+        _type = TimeSeriesDataType.objects.get(
+            category=TimeSeriesDataType.activities, resource='steps')
+        _type.intraday_support = True
+        _type.save()
+
+        result = get_time_series_data.apply_async(
+            (self.fbuser.fitbit_user, _type.category, _type.resource,),
+            {'date': parser.parse(self.date)})
+        result.get()
+        print("number of tsd objects:", TimeSeriesData.objects.all().count())
+
 
 class RetrievalViewTestBase(object):
     """Base methods for the get_steps view."""
